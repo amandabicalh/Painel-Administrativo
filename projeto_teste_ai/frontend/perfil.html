@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title>Perfil</title>
+
+<style>
+
+body{
+font-family:Arial;
+background:#f4f6fb;
+padding:40px;
+}
+
+.container{
+max-width:500px;
+margin:auto;
+background:white;
+padding:30px;
+border-radius:10px;
+box-shadow:0 5px 20px rgba(0,0,0,0.08);
+}
+
+h1{
+margin-bottom:20px;
+}
+
+.info{
+margin-bottom:15px;
+font-size:16px;
+}
+
+.label{
+font-weight:bold;
+}
+
+.buttons{
+margin-top:25px;
+display:flex;
+gap:10px;
+}
+
+button{
+background:#b791dd;
+color:white;
+border:none;
+padding:10px 18px;
+border-radius:8px;
+cursor:pointer;
+}
+
+.logout{
+background:#ff4d4d;
+}
+
+button:hover{
+opacity:0.9;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Meu Perfil</h1>
+
+<div class="info">
+<span class="label">ID:</span>
+<span id="id"></span>
+</div>
+
+<div class="info">
+<span class="label">Email:</span>
+<span id="email"></span>
+</div>
+
+<div class="buttons">
+<button onclick="voltar()">Voltar ao Dashboard</button>
+<button class="logout" onclick="logout()">Logout</button>
+</div>
+
+</div>
+
+<script>
+
+const token = localStorage.getItem("token");
+const usuarioLogado = localStorage.getItem("usuarioLogado");
+
+if(!token || !usuarioLogado){
+alert("Sessão expirada. Faça login novamente.");
+window.location.href="index.html";
+}
+
+async function carregarPerfil(){
+
+try{
+
+const resposta = await fetch("http://127.0.0.1:5000/me",{
+headers:{
+Authorization:"Bearer " + token
+}
+});
+
+if(!resposta.ok){
+throw new Error("Sessão inválida");
+}
+
+const usuario = await resposta.json();
+
+document.getElementById("id").textContent = usuario.id;
+document.getElementById("email").textContent = usuario.email;
+
+}catch(erro){
+
+alert("Sessão expirada. Faça login novamente.");
+
+logout();
+
+}
+
+}
+
+function voltar(){
+window.location.href="dashboard.html";
+}
+
+function logout(){
+
+localStorage.removeItem("usuarioLogado");
+localStorage.removeItem("token");
+
+window.location.href="index.html";
+
+}
+
+carregarPerfil();
+
+</script>
+
+</body>
+</html>

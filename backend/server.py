@@ -92,6 +92,7 @@ def login():
 
     if usuario and check_password_hash(usuario[2], senha):
 
+        # TOKEN GUARDA O ID DO USUÁRIO
         token = create_access_token(identity=usuario[1])
 
         return jsonify({
@@ -144,6 +145,34 @@ def deletar_usuario(id):
     conn.close()
 
     return jsonify({"mensagem": "Usuário deletado com sucesso"})
+
+
+# PERFIL DO USUÁRIO LOGADO
+@app.route("/me", methods=["GET"])
+@jwt_required()
+def usuario_logado():
+
+    user_email = get_jwt_identity()
+
+    conn = sqlite3.connect("usuarios.db")
+    cursor = conn.cursor()
+
+    cursor.execute(
+        "SELECT id, email FROM usuarios WHERE email=?",
+        (user_email,)
+    )
+
+    usuario = cursor.fetchone()
+
+    conn.close()
+
+    if not usuario:
+        return jsonify({"erro": "Usuário não encontrado"}), 404
+
+    return jsonify({
+        "id": usuario[0],
+        "email": usuario[1]
+    })
 
 
 if __name__ == "__main__":
