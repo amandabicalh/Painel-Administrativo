@@ -142,7 +142,7 @@ Este projeto foi desenvolvido com o objetivo de praticar:
 ![Tabela usuário](Screenshotsadm/tabela.png)
 
 ### Dark Mode
-![Dark Mode](Screenshotsadm/\paineladmdark.png)
+![Dark Mode](Screenshotsadm/paineladmdark.png)
 
 ---
 
