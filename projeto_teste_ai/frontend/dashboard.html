@@ -303,6 +303,33 @@ transition:0.2s;
 background:#574bdb;
 }
 
+.modal{
+display:none;
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:rgba(0,0,0,0.4);
+justify-content:center;
+align-items:center;
+}
+
+.modal-box{
+background:white;
+padding:25px;
+border-radius:10px;
+text-align:center;
+width:300px;
+}
+
+.modal-buttons{
+margin-top:20px;
+display:flex;
+gap:10px;
+justify-content:center;
+}
+
 .cancelar{
 background:#bbb !important;
 }
@@ -372,6 +399,18 @@ margin:auto;
 display:block;
 }
 
+.busca{
+margin-bottom:15px;
+}
+
+.busca input{
+width:250px;
+padding:10px;
+border-radius:8px;
+border:1px solid #ccc;
+font-size:14px;
+}
+
 </style>
 
 </head>
@@ -395,6 +434,8 @@ display:block;
 <button class="active" onclick="irDashboard()">🏠 Dashboard</button>
 
 <button onclick="irPerfil()">👤 Perfil</button>
+
+<button onclick="irSobre()">ℹ Sobre</button>
 
 <button onclick="toggleDarkMode()">🌙 Dark Mode</button>
 
@@ -446,12 +487,41 @@ display:block;
   <button class="novo-usuario" onclick="abrirModal()">+ Novo usuário</button>
 </div>
 
+
+<div class="busca">
+
+<input 
+type="text" 
+id="buscarUsuario" 
+placeholder="Buscar usuário..."
+onkeyup="filtrarUsuarios()">
+
+</div>
+
+<div id="modalExcluir" class="modal">
+
+<div class="modal-box">
+
+<h3>⚠ Confirmar exclusão</h3>
+
+<p>Tem certeza que deseja excluir este usuário?</p>
+
+<div class="modal-buttons">
+<button onclick="fecharModalExcluir()">Cancelar</button>
+<button class="delete" onclick="confirmarExcluir()">Excluir</button>
+</div>
+
+</div>
+
+</div>
+
 <table>
 
 <thead>
 <tr>
-<th>ID</th>
-<th>Email</th>
+<th onclick="ordenarTabela('id')">ID ⬍</th>
+<th onclick="ordenarTabela('email')">Email ⬍</th>
+<th>Criado em</th>
 <th>Ação</th>
 </tr>
 </thead>
@@ -519,8 +589,9 @@ linha.innerHTML=`
 
 <td>${u.id}</td>
 <td>${u.email}</td>
+<td>${u.criado_em || "—"}</td>
 <td>
-${podeExcluir ? `<button class="delete" onclick="deletarUsuario(${u.id})">Excluir</button>` : ""}
+${podeExcluir ? `<button class="delete" onclick="abrirModalExcluir(${u.id})">Excluir</button>` : ""}
 </td>
 
 `;
@@ -571,21 +642,20 @@ cutout:"70%"
 
 async function deletarUsuario(id){
 
-const confirmar=confirm("Tem certeza que deseja excluir este usuário?");
+const confirmar = confirm("Deseja realmente excluir este usuário?");
 
 if(!confirmar){
 return;
 }
 
 await fetch(`http://127.0.0.1:5000/usuarios/${id}`,{
-
 method:"DELETE",
-
 headers:{
 Authorization:"Bearer " + token
 }
-
 });
+
+alert("Usuário excluído com sucesso");
 
 carregarUsuarios();
 
@@ -613,10 +683,10 @@ carregarUsuarios();
 function abrirModal(){
 document.getElementById("modalUsuario").style.display="flex";
 }
-
-function fecharModal(){
+function fecharModalUsuario(){
 document.getElementById("modalUsuario").style.display="none";
 }
+
 
 async function criarUsuario(){
 
@@ -672,6 +742,89 @@ document.body.classList.toggle("dark");
 
 }
 
+function filtrarUsuarios(){
+
+const filtro = document
+.getElementById("buscarUsuario")
+.value
+.toLowerCase();
+
+const linhas = document.querySelectorAll("#tabelaUsuarios tr");
+
+linhas.forEach(linha => {
+
+const email = linha.children[1].textContent.toLowerCase();
+
+linha.style.display = email.includes(filtro) ? "" : "none";
+
+});
+
+}
+
+let usuarioParaExcluir = null;
+
+function abrirModalExcluir(id){
+usuarioParaExcluir = id;
+document.getElementById("modalExcluir").style.display="flex";
+}
+
+function fecharModalExcluir(){
+document.getElementById("modalExcluir").style.display="none";
+}
+
+async function confirmarExcluir(){
+
+await fetch(`http://127.0.0.1:5000/usuarios/${usuarioParaExcluir}`,{
+
+method:"DELETE",
+
+headers:{
+Authorization:"Bearer " + token
+}
+
+});
+
+fecharModal();
+carregarUsuarios();
+
+}
+
+let ordem = {
+id:true,
+email:true
+};
+
+function ordenarTabela(campo){
+
+const tabela = document.getElementById("tabelaUsuarios");
+
+const linhas = Array.from(tabela.querySelectorAll("tr"));
+
+linhas.sort((a,b)=>{
+
+const aValor = a.children[campo==="id"?0:1].textContent;
+const bValor = b.children[campo==="id"?0:1].textContent;
+
+if(ordem[campo]){
+return aValor.localeCompare(bValor,undefined,{numeric:true});
+}else{
+return bValor.localeCompare(aValor,undefined,{numeric:true});
+}
+
+});
+
+ordem[campo] = !ordem[campo];
+
+tabela.innerHTML="";
+linhas.forEach(l=>tabela.appendChild(l));
+
+}
+
+function irSobre(){
+window.location.href="sobre.html";
+}
+
+
 </script>
 
 <div id="modalUsuario" class="modal">
@@ -686,7 +839,7 @@ document.body.classList.toggle("dark");
 
     <div class="modal-botoes">
       <button onclick="criarUsuario()">Criar</button>
-      <button class="cancelar" onclick="fecharModal()">Cancelar</button>
+      <button class="cancelar" onclick="fecharModalUsuario()">Cancelar</button>
     </div>
 
   </div>
