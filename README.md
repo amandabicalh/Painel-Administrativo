@@ -133,16 +133,16 @@ Este projeto foi desenvolvido com o objetivo de praticar:
 ## Demonstração do Sistema
 
 ### Tela de Login
-![Login](screenshotsadm/login.png)
+![Login](Screenshotsadm/login.png)
 
 ### Dashboard
-![Dashboard](screenshotsadm/paineladm.png)
+![Dashboard](Screenshotsadm/paineladm.png)
 
 ### Tabela de usuários
-![Tabela usuário](screenshotsadm/tabela.png)
+![Tabela usuário](Screenshotsadm/tabela.png)
 
 ### Dark Mode
-![Dark Mode](screenshotsadm/\paineladmdark.png)
+![Dark Mode](Screenshotsadm/\paineladmdark.png)
 
 ---
 
